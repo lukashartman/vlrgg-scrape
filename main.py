@@ -1,3 +1,6 @@
+from selenium import webdriver
+
+from data_utils import *
 from scraper_utils import *
 
 driver = webdriver.Firefox()
@@ -8,9 +11,14 @@ for match_element in match_elements:
     driver.execute_script("window.open(arguments[0], '_blank')", match_element.get_attribute("href"))
     driver.switch_to.window(driver.window_handles[1])
 
-    print(get_teams(driver))
+    team_names = get_teams(driver)
+    print(team_names)
 
-    print(get_team_loadout(driver))
+    team_loadouts = get_team_loadout(driver)
+    print(team_loadouts)
+
+    team_a_data = rectify_team_data(team_loadouts, team_names[0], team_names[1])
+    print(team_a_data)
 
     # Go back to the desired page and close the opened tab
     driver.close()

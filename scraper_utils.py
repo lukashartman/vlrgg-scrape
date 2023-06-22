@@ -70,10 +70,22 @@ def get_team_loadout(driver):
         # loop through all td elements
         for round_element in round_elements:
             # check if div has class "bank"
-            if round_element.find_elements(By.CLASS_NAME, "bank"):
-                bank_values.append(round_element.find_element(By.CLASS_NAME, "bank").text)
+            if round_element.find_elements(By.CLASS_NAME, "round-num"):
+                team_a = round_element.find_element(By.CLASS_NAME, "bank").text
+                team_b = round_element.find_element(By.CLASS_NAME, "bank").text
+                win_lose = get_score(round_element)
+                bank_values.append(((team_a, team_b), win_lose))
                 driver.execute_script("arguments[0].style.backgroundColor = 'green'", round_element)
         map_loadouts.update({sanitize_map_name(current_map): bank_values})
 
         # print bank values
     return map_loadouts
+
+
+def get_score(round_element):
+    winner_encode = round_element.find_element(By.CLASS_NAME, "rnd-sq").get_attribute("class")
+
+    if "t" in winner_encode:
+        return True, False
+    else:
+        return False, True
