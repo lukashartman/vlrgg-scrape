@@ -1,10 +1,4 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-from scraper_utils import get_team_loadout
-
+from scraper_utils import *
 
 driver = webdriver.Firefox()
 driver.get("https://www.vlr.gg/matches/results")
@@ -13,6 +7,8 @@ for match_element in match_elements:
     # open the link in a new tab and switch to it
     driver.execute_script("window.open(arguments[0], '_blank')", match_element.get_attribute("href"))
     driver.switch_to.window(driver.window_handles[1])
+
+    print(get_teams(driver))
 
     print(get_team_loadout(driver))
 

@@ -1,10 +1,26 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from data_utils import sanitize_map_name
+
+
+def get_teams(driver):
+    # Select div with class "match-header-vs-score"
+    div = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "div.match-header-vs"))
+    )
+    driver.execute_script("arguments[0].style.backgroundColor = 'orange'", div)
+
+    # Get text of both divs with class "wf-title-med"
+    team_elements = div.find_elements(By.CLASS_NAME, "wf-title-med")
+    team_names = [team_element.text for team_element in team_elements]
+    return team_names
+
 
 def get_team_loadout(driver):
+    # Pro play is max bo5
+    map_loadouts = dict()
 
     # Find the element with data-tab="economy"
     economy_element = WebDriverWait(driver, 10).until(
@@ -23,6 +39,9 @@ def get_team_loadout(driver):
         data_disabled = map_switch_element.get_attribute("data-disabled")
         if data_disabled == "1":
             break  # Stop the loop if data-disabled is '1'
+
+        # div within map_switch_element
+        current_map = map_switch_element.find_element(By.CSS_SELECTOR, "div").text
 
         # Click on the map switch element
         map_switch_element.click()
@@ -54,7 +73,7 @@ def get_team_loadout(driver):
             if round_element.find_elements(By.CLASS_NAME, "bank"):
                 bank_values.append(round_element.find_element(By.CLASS_NAME, "bank").text)
                 driver.execute_script("arguments[0].style.backgroundColor = 'green'", round_element)
+        map_loadouts.update({sanitize_map_name(current_map): bank_values})
 
         # print bank values
-        return(bank_values)
-
+    return map_loadouts
